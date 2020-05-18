@@ -5,9 +5,18 @@
 
 (defgeneric encode-yaml-to-emitter (emitter object))
 
+(defmethod encode-yaml-to-emitter (emitter (object (eql 'nil)))
+  (yaml.emitter:emit-object emitter object))
+
 (defmethod encode-yaml-to-emitter (emitter (object list))
   (yaml.emitter:emit-sequence (emitter)
     (loop for el in object
+          do
+             (encode-yaml-to-emitter emitter el))))
+
+(defmethod encode-yaml-to-emitter (emitter (object vector))
+  (yaml.emitter:emit-sequence (emitter)
+    (loop for el across object
           do
              (encode-yaml-to-emitter emitter el))))
 
@@ -18,7 +27,7 @@
              (encode-yaml-to-emitter emitter k)
              (encode-yaml-to-emitter emitter v))))
 
-(defmethod encode-yaml-to-emitter (emitter (object t))
+(defmethod encode-yaml-to-emitter (emitter object)
   (yaml.emitter:emit-object emitter object))
 
 
